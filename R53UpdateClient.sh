@@ -6,8 +6,8 @@
 echo "---***STARTING ROUTE53 UPDATE DDNS SCRIPT---***"
 
 #VARIABLES
-DOMAIN="qpi.saadqazi.com"
-ZONEID="Z3P6R9T7DGQWGS"
+DOMAIN="<URL>"
+ZONEID="<ZID>"
 EXT_IP=$(curl http://ifconfig.me)
 DNS_WAN_IP=$(dig +short $DOMAIN)
 
@@ -33,7 +33,7 @@ cat > /home/pi/ddns/r53-update.json << __EOF__
       {
         "Action": "UPSERT",
         "ResourceRecordSet": {
-          "Name": "qpi.saadqazi.com",
+          "Name": "<URL>",
           "Type": "A",
           "TTL": 300,
           "ResourceRecords": [
