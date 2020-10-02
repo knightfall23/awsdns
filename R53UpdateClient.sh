@@ -6,22 +6,22 @@
 echo "---***STARTING ROUTE53 UPDATE DDNS SCRIPT---***"
 
 #VARIABLES
-DOMAIN="<URL>"
-ZONEID="<ZID>"
-EXT_IP=$(curl http://ifconfig.me)
-DNS_WAN_IP=$(dig +short $DOMAIN)
+DOMAIN="<URL>" #my.domain.com
+ZONEID="<ZID>" #L6M2KA4YKHWS 
+EXT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+DNS_URL_WAN_IP=$(dig +short $DOMAIN)
 
 echo -e "\nToday is $(date)\n" #>> mywanip.txt
 echo "QPI CURRENT WAN IP = ${EXT_IP}"
-echo -e "$DOMAIN CURRENT WAN IP = ${DNS_WAN_IP}\n"
+echo -e "$DOMAIN CURRENT WAN IP = ${DNS_URL_WAN_IP}\n"
 
 #if else statement to check if DNS WAN IP have changed
 
-if [ "$EXT_IP" = "$DNS_WAN_IP" ]
+if [ "$EXT_IP" = "$DNS_URL_WAN_IP" ]
 #if [ 1 -eq 1 ]
 then
  echo "QPI IP HAS NOT CHANGED, IT IS: $EXT_IP"
- echo "$DOMAIN IP HAS NOT CHANGED, IT IS: $DNS_WAN_IP"
+ echo "$DOMAIN IP HAS NOT CHANGED, IT IS: $DNS_URL_WAN_IP"
  exit 1
 else
  echo -e "--**IPS HAVE CHANGE**--D\nUPDATING AWS..."
