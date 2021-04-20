@@ -3,31 +3,36 @@
 # and if WAN IPs are different, update .json config with the latest WAN IP
 # and push route53 change via AWS CLI
 
-echo "---***STARTING ROUTE53 UPDATE DDNS SCRIPT---***"
 
 #VARIABLES
-DOMAIN="<URL>" #my.domain.com
+DOMAIN="qpitor.saadqazi.com" #my.domain.com
 ZONEID="<ZID>" #L6M2KA4YKHWS 
 EXT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-DNS_URL_WAN_IP=$(dig +short $DOMAIN)
+DOMAIN_IP=$(dig +short $DOMAIN)
+LOG=awsndslogs.txt
+DIR=$(pwd)
 
-echo -e "\nToday is $(date)\n" #>> mywanip.txt
-echo "QPI CURRENT WAN IP = ${EXT_IP}"
-echo -e "$DOMAIN CURRENT WAN IP = ${DNS_URL_WAN_IP}\n"
+
+echo "---*** STARTING ROUTE53 DNS UPDATE SCRIPT ---***" >>$LOG
+echo -e " Today is: $(date) " >> $LOG
+echo " RPI CURRENT WAN IP = ${EXT_IP} " >> $LOG
+echo -e " $DOMAIN CURRENT WAN IP = ${DOMAIN_IP} " >> $LOG
 
 #if else statement to check if DNS WAN IP have changed
 
-if [ "$EXT_IP" = "$DNS_URL_WAN_IP" ]
+if [ "1.1.1.1" = "$DOMAIN_IP" ]
 #if [ 1 -eq 1 ]
 then
- echo "QPI IP HAS NOT CHANGED, IT IS: $EXT_IP"
- echo "$DOMAIN IP HAS NOT CHANGED, IT IS: $DNS_URL_WAN_IP"
+ echo "NO CHANGE IN IP ADDR...EXITING SCRIPT!" >> $LOG
+ echo "RPI IP HAS NOT CHANGED, IT IS: $EXT_IP" | 
+ echo "$DOMAIN IP HAS NOT CHANGED, IT IS: $DOMAIN_IP"
  exit 1
 else
- echo -e "--**IPS HAVE CHANGE**--D\nUPDATING AWS..."
- echo "cd too /home/pi/ddns/"
-  cd /home/pi/ddns
-cat > /home/pi/ddns/r53-update.json << __EOF__
+ echo "YES CHANGE IN IP ADDR!"
+ echo -e "IPS HAVE CHANGED! UPDATING AWS..." >> $LOG
+ echo "cd $DIR"
+ cd $DIR
+cat > $DIR/r53-update.json << __EOF__
   {
     "Changes": [
       {
@@ -47,8 +52,7 @@ cat > /home/pi/ddns/r53-update.json << __EOF__
   }
 __EOF__
 aws route53 change-resource-record-sets --hosted-zone-id $ZONEID --change-batch file://r53-update.json
+echo "aws cmd ran!"
 fi
-
-
 echo "DONE SCRIPT...exit"
 exit 1
